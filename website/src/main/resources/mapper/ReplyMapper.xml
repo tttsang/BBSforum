@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jking.website.mapper.ReplyMapper" >
+  <resultMap id="BaseResultMap" type="com.jking.website.entity.Reply" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="post_id" property="postId" jdbcType="INTEGER" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="time" property="time" jdbcType="TIMESTAMP" />
+    <result column="ans_id" property="ansId" jdbcType="INTEGER"/>
+    <result column="picture_url" property="pictureUrl" jdbcType="VARCHAR"/>
+  </resultMap>
+  <resultMap id="reply" type="com.jking.website.entity.Reply">
+    <id column="id" property="id" jdbcType="INTEGER"/>
+    <result column="content" property="content" jdbcType="VARCHAR"/>
+    <result column="time" property="time" jdbcType="VARCHAR"/>
+    <result column="ans_id" property="ansId" jdbcType="INTEGER"/>
+    <result column="picture_url" property="pictureUrl" jdbcType="VARCHAR"/>
+    <association property="user" javaType="com.jking.website.entity.User">
+      <result property="phonenum" column="phonenum" jdbcType="VARCHAR"/>
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, post_id, content, time
+  </sql>
+  <select id="showReply" resultMap="reply" parameterType="java.lang.Integer">
+   SELECT r.content,r.time,r.picture_url,t2.phonenum from reply r,
+(SELECT u.phonenum,u.id from user u where u.id in (SELECT ans_id from reply where post_id=#{id,jdbcType=INTEGER}))t2
+WHERE r.post_id=#{id,jdbcType=INTEGER} and r.ans_id=t2.id limit #{page,jdbcType=INTEGER},6;
+
+  </select>
+  <select id="showNewReply" resultMap="reply" parameterType="java.lang.Integer">
+    SELECT r.content,r.time,r.picture_url,t2.phonenum from reply r,
+(SELECT u.phonenum,u.id from user u where u.id in (SELECT ans_id from reply where post_id=#{id,jdbcType=INTEGER}))t2
+WHERE r.post_id=#{id,jdbcType=INTEGER} and r.ans_id=t2.id
+     ORDER BY time DESC limit #{page,jdbcType=INTEGER},6;
+
+  </select>
+  <select id="totalReply" resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM reply WHERE post_id=#{pid,jdbcType=INTEGER};
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from reply
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from reply
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.jking.website.entity.Reply" >
+    insert into reply (id, post_id, content, 
+      time)
+    values (#{id,jdbcType=INTEGER}, #{postId,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR}, 
+      #{time,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jking.website.entity.Reply" >
+    insert into reply
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="postId != null" >
+        post_id,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="time != null" >
+        time,
+      </if>
+      <if test="pictureUrl != null" >
+        picture_url,
+      </if>
+      <if test="ansId != null" >
+        ans_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="postId != null" >
+        #{postId,jdbcType=INTEGER},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null" >
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="pictureUrl != null">
+        #{pictureUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="ansId != null">
+        #{ansId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jking.website.entity.Reply" >
+    update reply
+    <set >
+      <if test="postId != null" >
+        post_id = #{postId,jdbcType=INTEGER},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null" >
+        time = #{time,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jking.website.entity.Reply" >
+    update reply
+    set post_id = #{postId,jdbcType=INTEGER},
+      content = #{content,jdbcType=VARCHAR},
+      time = #{time,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jking.website.mapper.PostMapper" >
+  <resultMap id="BaseResultMap" type="com.jking.website.entity.Post" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="use_id" property="useId" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="time" property="time" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="post" type="com.jking.website.entity.Post" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR"/>
+    <result column="time" property="time" jdbcType="VARCHAR"/>
+      <result column="picture_url" property="pictureUrl" jdbcType="VARCHAR"/>
+    <association property="user" javaType="com.jking.website.entity.User">
+      <id property="id" column="id" jdbcType="INTEGER"/>
+      <result property="phonenum" column="phonenum" jdbcType="VARCHAR"/>
+    </association>
+  </resultMap>
+ <resultMap id="content" type="com.jking.website.entity.Post">
+   <id column="id" property="id" jdbcType="INTEGER"/>
+   <result column="title" property="title" jdbcType="VARCHAR"/>
+   <result column="time" property="time" jdbcType="VARCHAR"/>
+   <result column="content" property="content" jdbcType="VARCHAR"/>
+     <result column="picture_url" property="pictureUrl" jdbcType="VARCHAR"/>
+   <association property="user" javaType="com.jking.website.entity.User">
+     <result property="phonenum" column="phonenum" jdbcType="VARCHAR"/>
+   </association>
+ </resultMap>
+  <sql id="Base_Column_List" >
+    id, use_id, title, content, time
+  </sql>
+  <select id="index" resultMap="post" parameterType="java.lang.Integer">
+   SELECT t1.phonenum,t2.title,t2.time,t2.id FROM  post t2
+    LEFT JOIN user t1 on t2.use_id=t1.id ORDER BY t2.time DESC limit #{page,jdbcType=INTEGER},6 ;
+  </select>
+  <select id="count" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    SELECT COUNT(*) FROM post ;
+  </select>
+    <select id="selectPoster" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+       SELECT id,use_id from post where id=#{pid,jdbcType=INTEGER};
+    </select>
+  <select id="showContent" resultMap="content" parameterType="java.lang.Integer">
+    SELECT t1.phonenum,t2.content,t2.time,t2.title,t2.picture_url from user t1,post t2 where
+    t1.id=t2.use_id AND t2.id=#{uid,jdbcType=INTEGER};
+  </select>
+  <select id="findPost" resultMap="post">
+    SELECT p.id,p.time,p.title FROM
+    (SELECT b.id from post b where title LIKE CONCAT('%',#{title},'%'))t1 ,post p WHERE t1.id=p.id ORDER BY p.time DESC
+    limit #{page},6;
+
+  </select>
+  <select id="countSearch" resultType="java.lang.Integer" parameterType="java.lang.String">
+    SELECT COUNT(*)FROM(SELECT p.id post_id,p.time,p.title FROM
+    (SELECT b.id from post b where title LIKE CONCAT('%',#{title},'%'))t1 ,post p WHERE t1.id=p.id ORDER BY p.time DESC)t4;
+
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from post
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from post
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.jking.website.entity.Post" >
+    insert into post (id, use_id, title, 
+      content, time)
+    values (#{id,jdbcType=INTEGER}, #{useId,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, 
+      #{content,jdbcType=VARCHAR}, #{time,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jking.website.entity.Post" >
+    insert into post
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="useId != null" >
+        use_id,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="time != null" >
+        time,
+      </if>
+      <if test="pictureUrl != null">
+        picture_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="useId != null" >
+        #{useId,jdbcType=INTEGER},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null" >
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+        <if test="pictureUrl != null">
+        #{pictureUrl,jdbcType=VARCHAR},
+        </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jking.website.entity.Post" >
+    update post
+    <set >
+      <if test="useId != null" >
+        use_id = #{useId,jdbcType=INTEGER},
+      </if>
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null" >
+        time = #{time,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jking.website.entity.Post" >
+    update post
+    set use_id = #{useId,jdbcType=INTEGER},
+      title = #{title,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      time = #{time,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

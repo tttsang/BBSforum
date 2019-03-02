@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>webSocket</title>
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+</head>
+<body>
+请名称<input type="text" id="username">
+<input type="button" value="连接" onclick="connect()"/>   <br>
+请输入发送的内容：<input type="text" id="writeMsg"/>
+                  <input type="button" value="发送" onclick="sendMsg()"/>
+<script type="text/javascript" >
+    var ws =null;
+    function connect() {
+        if ($("#username").val()!=null&&$("#username").val()!="")
+        {
+            // if('WebSocket' in window)
+            // {
+                ws= new WebSocket("ws://localhost:8081/socketserver/"+$("#username").val());
+            // }
+            // if ('MozWebSocket' in window)
+            // {
+            //     ws=new MozWebSocket ("ws://localhost:8080/socketserver/"+$("#username").val());
+            // }
+            // else
+            // {
+            //     alert("不支持socket")
+            // }
+            ws.onmessage=function (ev) {
+                alert(ev.data);
+            }
+            ws.onclose=function (ev) {
+                alert("连接中断");
+            }
+            ws.onopen=function (ev) {
+                alert("连接成功");
+            }
+        }
+        else {
+            alert("请输入名字");
+        }
+        function sendMsg() {
+            ws.send($("#writeMsg").val());
+        }
+
+    }
+</script>
+</body>
+</html>

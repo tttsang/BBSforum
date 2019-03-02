@@ -1,0 +1,36 @@
+server:
+  port: 8081
+
+spring:
+    jmx:
+         false;
+    datasource:
+        url: jdbc:mysql://127.0.0.1/forume
+        username: root
+        password:
+        driver-class-name: com.mysql.jdbc.Driver
+        type: com.alibaba.druid.pool.DruidDataSource
+    redis:
+        host: 127.0.0.1
+        port: 6379
+        password:
+
+    jackson:
+        serialization:
+            write-dates-as-timestamps: true
+    servlet:
+                multipart:
+                    maxFileSize: 100Mb
+                    maxRequestSize: 1000Mb
+mybatis:
+    mapperLocations: classpath:mapper/*.xml
+    type-aliases-package: com.jking.website.entity
+#    configuration:
+#        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#logging:
+#    level:
+#        com.jking.computersite.mapper: trace # 改成你的mapper文件所在包路径
+
+ 
+
